@@ -50,8 +50,8 @@ int main(int argc, char **argv) {
     init(argc, argv);
 
     omp_init_lock(&lock1);
-    omp_init_lock_with_hint(&lock2, omp_lock_hint_contended);
-    omp_init_lock_with_hint(&lock3, omp_lock_hint_uncontended);
+//    omp_init_lock_with_hint(&lock2, omp_lock_hint_contended);
+//    omp_init_lock_with_hint(&lock3, omp_lock_hint_uncontended);
 
     /* GENERATE REFERENCE TIME */
     reference("reference time 1", &refer);
@@ -89,17 +89,17 @@ int main(int argc, char **argv) {
     benchmark("LOCK_CONTENDED", &testlock);
     }
     /* TEST  LOCK/UNLOCK CONTENDED WITH HINT*/
-    if((strcmp("LOCK_CONTENDED_HINT",type)==0)||(strcmp("ALL",type)==0)){
+    /*if((strcmp("LOCK_CONTENDED_HINT",type)==0)||(strcmp("ALL",type)==0)){
     benchmark("LOCK_CONTENDED_HINT", &testlockhint);
-    }
+    }*/
     /* TEST  LOCK/UNLOCK UNCONTENDED*/
     if((strcmp("LOCK_UNCONTENDED",type)==0)||(strcmp("ALL",type)==0)){
     benchmark("LOCK_UNCONTENDED", &testlockuncontended);
     }
-    /* TEST  LOCK/UNLOCK UNCONTENDED WITH HINT*/
+    /* TEST  LOCK/UNLOCK UNCONTENDED WITH HINT*//*
     if((strcmp("LOCK_UNCONTENDED_HINT",type)==0)||(strcmp("ALL",type)==0)){
     benchmark("LOCK_UNCONTENDED_HINT", &testlockuncontendedhint);
-    }
+    }*/
     /* TEST ORDERED SECTION */
     if((strcmp("ORDERED",type)==0)||(strcmp("ALL",type)==0)){
     benchmark("ORDERED", &testorder);
@@ -256,7 +256,7 @@ void testlock() {
 	}
     }
 }
-void testlockhint() {
+/*void testlockhint() {
     int j;
 
 #pragma omp parallel private(j)
@@ -267,7 +267,7 @@ void testlockhint() {
 	    omp_unset_lock(&lock2);
 	}
     }
-}
+}*/
 
 void testlockuncontended() {
     int j;
@@ -285,7 +285,7 @@ void testlockuncontended() {
     }
 }
 
-void testlockuncontendedhint() {
+/*void testlockuncontendedhint() {
     int j;
 
 #pragma omp parallel private(j)
@@ -299,7 +299,7 @@ void testlockuncontendedhint() {
 	}
       }
     }
-}
+}*/
 
 void testorder() {
     int j;

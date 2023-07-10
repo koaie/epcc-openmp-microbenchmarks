@@ -1,6 +1,10 @@
+# Uncomment the following line to use OpenMP 2.0 features
 
-CC=cc
+# Uncomment the following line to use OpenMP 3.0 features
+
+
+CC=gcc
 CFLAGS = -fopenmp 
 LDFLAGS = -fopenmp  
-CPPFLAGS = -E 
+CPPFLAGS = -P 
 LIBS = -lm  
