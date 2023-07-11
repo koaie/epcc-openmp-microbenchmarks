@@ -31,6 +31,7 @@
 ****************************************************************************/
 
 #include <stdlib.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -67,6 +68,7 @@ double testsd;		 // The standard deviation in the test time in
 			 // microseconds for outerreps runs.
 double testmed;          // The median test time in microseconds for
 			 // outerreps runs
+bool raw_data;     // Flag for printing raw iteration data.
 
 void dofile(char *filename);/* Read a file, parse, render back, etc. */
 void usage(char *argv[]) {
@@ -109,6 +111,8 @@ void parse_args(int argc, char *argv[]) {
 		exit(EXIT_FAILURE);
 	    }
 
+        } else if (strcmp(argv[arg], "--raw-data") == 0) {
+            raw_data = 1;
 	} else if (strcmp(argv[arg], "-h") == 0) {
 	    usage(argv);
 	    exit(EXIT_SUCCESS);
@@ -307,6 +311,12 @@ void printreferencefooter(char *name, double referencetime, double referencesd, 
 	   name, referencemed);
 }
 
+void printrawdata(char *name) {
+    for (int i = 0; i < outerreps; i++) {
+        printf("%d, %f, %s\n", i, times[i],name);
+    }
+}
+
 void init(int argc, char **argv)
 {
 #pragma omp parallel
@@ -332,7 +342,11 @@ void init(int argc, char **argv)
     delaylength = getdelaylengthfromtime(delaytime); 
 
     times = malloc((outerreps) * sizeof(double));
-
+    
+    if(raw_data) {
+      printf("iteration, time, name\n");
+      return;
+    }
     printf("Running OpenMP benchmark version 4.0\n"
 	   "\t%d thread(s)\n"
 	   "\t%d outer repetitions\n"
@@ -361,9 +375,9 @@ void reference(char *name, void (*refer)(void)) {
 
     // Calculate the required number of innerreps
     innerreps = getinnerreps(refer);
-
-    initreference(name);
-
+    if(!raw_data) {
+      initreference(name);
+    }
     // ignore timing for first time through 
     refer();
 
@@ -373,7 +387,10 @@ void reference(char *name, void (*refer)(void)) {
 	refer();
 	times[k] = (getclock() - start) * 1.0e6 / (double) innerreps;
     }
-
+    if(raw_data) {
+      printrawdata(name);
+      return;
+    }
     finalisereference(name);
 
 }
@@ -403,9 +420,9 @@ void benchmark(char *name, void (*test)(void))
 
     // Calculate the required number of innerreps
     innerreps = getinnerreps(test);
-
-    inittest(name);
-
+    if(!raw_data) {
+      inittest(name);
+    }
     // ignore timing for first time through 
     test();
 
@@ -415,9 +432,11 @@ void benchmark(char *name, void (*test)(void))
 	test();
 	times[k] = (getclock() - start) * 1.0e6 / (double) innerreps;
     }
-
+    if(raw_data) {
+      printrawdata(name);
+      return;
+    }
     finalisetest(name);
-
 }
 
 void delay(int delaylength) {
